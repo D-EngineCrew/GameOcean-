@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GameOcean – Mods, interfaces y más</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Figtree:wght@400;500;700&display=swap">
+<style>
+:root{--abyss:#030d22;--deep:#061a3d;--navy:#0a2a5e;--card:#0b2250;--cyan:#19e3ff;--aqua:#3dffd0;--foam:#d9f6ff;--mute:#8fb4d6;
+--glow:0 0 18px rgba(25,227,255,.45);color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(1200px 700px at 80% -10%,#0d3b86 0,transparent 60%),linear-gradient(#061a3d,#030d22 70%);background-attachment:fixed;color:var(--foam);font:16px/1.5 Figtree,system-ui,sans-serif;min-height:100vh}
+h1,h2,h3,.logo{font-family:Unbounded,Figtree,sans-serif;margin:0}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--aqua);outline-offset:2px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;gap:14px;align-items:center;padding:12px 5vw;background:rgba(3,13,34,.85);backdrop-filter:blur(10px);border-bottom:1px solid rgba(25,227,255,.25)}
+.logo{font-size:20px;color:var(--cyan);text-shadow:var(--glow);white-space:nowrap}
+nav{display:flex;gap:4px;overflow-x:auto;flex:1}
+nav a{padding:6px 12px;border-radius:999px;color:var(--mute);white-space:nowrap}
+nav a:hover,nav a.on{color:var(--abyss);background:var(--cyan)}
+.btn{border:0;cursor:pointer;font:700 15px Figtree,sans-serif;padding:10px 18px;border-radius:12px;background:linear-gradient(90deg,var(--cyan),var(--aqua));color:var(--abyss);box-shadow:var(--glow)}
+.btn.ghost{background:transparent;color:var(--cyan);border:1px solid var(--cyan);box-shadow:none}
+.hero{position:relative;overflow:hidden;padding:9vh 5vw 150px}
+.hero h1{font-size:clamp(34px,7vw,72px);line-height:1.05;max-width:14ch;text-shadow:0 0 30px rgba(25,227,255,.5)}
+.hero p{max-width:52ch;color:var(--mute);font-size:18px;margin:18px 0 26px}
+.search{display:flex;gap:8px;max-width:560px}
+.search input,.modal input,.modal select,.modal textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(25,227,255,.35);background:rgba(3,13,34,.7);color:var(--foam);font:inherit}
+.waves{position:absolute;left:0;right:0;bottom:0;height:130px;width:100%}
+.waves path{animation:sway 9s ease-in-out infinite alternate}
+.waves path:nth-child(2){animation-duration:12s;animation-direction:alternate-reverse}
+@keyframes sway{to{transform:translateX(-90px)}}
+.bub{position:absolute;bottom:-20px;border-radius:50%;border:1px solid rgba(61,255,208,.6);animation:rise linear infinite;pointer-events:none}
+@keyframes rise{to{transform:translateY(-110vh);opacity:0}}
+main{padding:0 5vw 60px}
+section{margin-top:44px}
+h2{font-size:22px;margin-bottom:16px;color:var(--aqua)}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.cat{padding:16px;border-radius:14px;background:var(--navy);border:1px solid rgba(25,227,255,.2);cursor:pointer;text-align:left;color:var(--foam);font:600 15px Figtree}
+.cat small{display:block;color:var(--mute);font-weight:400}
+.cat:hover,.cat.on{border-color:var(--cyan);box-shadow:var(--glow)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+.mod{background:var(--card);border-radius:16px;overflow:hidden;border:1px solid rgba(25,227,255,.18);transition:transform .2s,box-shadow .2s}
+.mod:hover{transform:translateY(-4px);box-shadow:var(--glow)}
+.thumb{height:130px;display:grid;place-items:center;font-size:44px}
+.mod div.info{padding:14px}
+.mod h3{font:700 16px Figtree;margin-bottom:2px}
+.meta{color:var(--mute);font-size:13px}
+.tags{display:flex;justify-content:space-between;margin-top:10px;font-size:13px;color:var(--aqua)}
+.empty{color:var(--mute);padding:30px;border:1px dashed rgba(25,227,255,.35);border-radius:14px;text-align:center}
+.modal{position:fixed;inset:0;background:rgba(3,13,34,.8);display:none;place-items:center;z-index:50;padding:16px}
+.modal.open{display:grid}
+.modal form{background:var(--deep);border:1px solid var(--cyan);box-shadow:var(--glow);border-radius:18px;padding:22px;width:min(480px,100%);max-height:90vh;overflow:auto;display:grid;gap:12px}
+label{display:grid;gap:5px;font-size:14px;color:var(--mute)}
+.row{display:flex;gap:10px;justify-content:flex-end}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--aqua);color:var(--abyss);padding:10px 18px;border-radius:12px;font-weight:700;display:none;z-index:60}
+footer{padding:30px 5vw;color:var(--mute);border-top:1px solid rgba(25,227,255,.15)}
+@media(max-width:640px){header{flex-wrap:wrap}nav{order:3;flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="#inicio">GameOcean</a>
+  <nav id="nav"></nav>
+  <button class="btn" id="open">Subir mod</button>
+</header>
+
+<div class="hero" id="inicio">
+  <h1>Sumérgete en los mejores mods</h1>
+  <p>Descarga y comparte mods, interfaces mejoradas, texturas, shaders y más. Gratis y hecho por la comunidad.</p>
+  <div class="search"><input id="q" type="search" placeholder="Busca un mod, juego o autor" aria-label="Buscar"></div>
+  <svg class="waves" viewBox="0 0 1200 130" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M-100 60 Q 50 20 200 60 T 500 60 T 800 60 T 1100 60 T 1400 60 V130 H-100Z" fill="rgba(25,227,255,.25)"/>
+    <path d="M-100 80 Q 50 45 200 80 T 500 80 T 800 80 T 1100 80 T 1400 80 V130 H-100Z" fill="rgba(10,42,94,.95)"/>
+  </svg>
+</div>
+
+<main>
+  <section id="categorias"><h2>Categorías</h2><div class="cats" id="cats"></div></section>
+  <section id="mods"><h2 id="title">Mods destacados</h2><div class="grid" id="grid"></div></section>
+</main>
+<footer>GameOcean · Comunidad de mods. Sube solo contenido que tengas derecho a compartir.</footer>
+
+<div class="modal" id="modal">
+  <form id="form">
+    <h2>Subir un mod</h2>
+    <label>Nombre del mod<input name="name" required maxlength="60"></label>
+    <label>Autor<input name="by" maxlength="30" placeholder="Tu nombre"></label>
+    <label>Juego<input name="game" required maxlength="40" placeholder="Minecraft, FNF, GTA..."></label>
+    <label>Categoría<select name="cat" id="catSel"></select></label>
+    <label>Descripción<textarea name="desc" rows="3" maxlength="300"></textarea></label>
+    <label>Archivo<input type="file" name="file" id="file" required></label>
+    <div class="row"><button type="button" class="btn ghost" id="close">Cancelar</button><button class="btn">Publicar</button></div>
+  </form>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const CATS=[["Todos","🌊"],["Mods","🧩"],["Interfaces","🖥️"],["Fondos de mar","🐠"],["Fondos neón","💠"],["Texturas","🎨"],["Shaders","✨"],["Sonidos","🔊"],["Herramientas","🛠️"]];
+const COLORS=["#0a2a5e,#19e3ff","#061a3d,#3dffd0","#0d3b86,#7b5cff","#04264f,#00b4ff"];
+/* Pega aquí los datos de tu proyecto de Supabase (Project Settings > API): la URL y la clave "anon public". */
+const SUPA_URL="",SUPA_KEY="";
+const H={apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY};
+const BAD=/\.(exe|bat|cmd|msi|scr|js|vbs|ps1|html?|svg)$/i;
+const fileUrl=m=>`${SUPA_URL}/storage/v1/object/public/mods/${m.path}?download=${encodeURIComponent(m.original)}`;
+let mods=[];
+let cat="Todos",q="";
+const $=s=>document.querySelector(s);
+function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function drawCats(){
+ $("#cats").innerHTML=CATS.map(([c,e])=>`<button class="cat ${c==cat?"on":""}" data-c="${c}">${e} ${c}<small>${c=="Todos"?mods.length:mods.filter(m=>m.cat==c).length} mods</small></button>`).join("");
+ $("#nav").innerHTML=CATS.slice(0,6).map(([c])=>`<a href="#mods" class="${c==cat?"on":""}" data-c="${c}">${c}</a>`).join("");
+ $("#catSel").innerHTML=CATS.slice(1).map(([c])=>`<option>${c}</option>`).join("");
+}
+function draw(){
+ const l=mods.filter(m=>(cat=="Todos"||m.cat==cat)&&(m.name+m.game+m.by).toLowerCase().includes(q));
+ $("#title").textContent=q?"Resultados":cat=="Todos"?"Mods destacados":cat;
+ $("#grid").innerHTML=l.length?l.map((m,i)=>{const [a,b]=COLORS[i%4].split(",");const e=(CATS.find(c=>c[0]==m.cat)||[0,"🌊"])[1];
+ return `<article class="mod"><div class="thumb" style="background:linear-gradient(135deg,${a},${b}55)">${e}</div><div class="info"><h3>${esc(m.name)}</h3><div class="meta">${esc(m.game)} · por ${esc(m.by)}</div><p class="meta">${esc(m.desc||"")}</p><div class="tags"><span>${esc(m.cat)}</span><span>${m.dl} descargas</span></div><p><a class="btn" style="display:inline-block" href="${fileUrl(m)}" data-id="${m.id}">Descargar</a></p></div></article>`}).join(""):`<div class="empty">No hay mods aquí todavía. Sé el primero en subir uno.</div>`;
+ drawCats();
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(b){cat=b.dataset.c;draw()}});
+$("#q").addEventListener("input",e=>{q=e.target.value.toLowerCase();draw()});
+const modal=$("#modal");
+$("#open").onclick=()=>modal.classList.add("open");
+$("#close").onclick=()=>modal.classList.remove("open");
+modal.addEventListener("click",e=>{if(e.target==modal)modal.classList.remove("open")});
+function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",2600)}
+async function load(){if(!SUPA_URL){toast("Falta configurar Supabase en el código");return}
+ try{const r=await fetch(SUPA_URL+"/rest/v1/mods?select=*&order=created_at.desc",{headers:H});if(!r.ok)throw 0;mods=(await r.json()).map(x=>({...x,by:x.author||"Anónimo",desc:x.descr}));draw()}catch{toast("No se pudo conectar con Supabase")}}
+document.addEventListener("click",e=>{const a=e.target.closest("a[data-id]");if(a)fetch(SUPA_URL+"/rest/v1/rpc/increment_dl",{method:"POST",headers:{...H,"Content-Type":"application/json"},body:JSON.stringify({mod_id:a.dataset.id})}).catch(()=>{})});
+$("#form").addEventListener("submit",async e=>{e.preventDefault();if(!SUPA_URL)return toast("Falta configurar Supabase en el código");
+ const f=new FormData(e.target),file=f.get("file"),b=e.submitter;
+ if(file.size>50*1024*1024)return toast("El archivo supera los 50 MB");
+ if(BAD.test(file.name))return toast("Tipo de archivo no permitido");
+ b.disabled=true;
+ try{const ext=(file.name.match(/\.[A-Za-z0-9]{1,8}$/)||[""])[0].toLowerCase(),path=crypto.randomUUID()+ext;
+  let r=await fetch(`${SUPA_URL}/storage/v1/object/mods/${path}`,{method:"POST",headers:{...H,"Content-Type":file.type||"application/octet-stream"},body:file});if(!r.ok)throw 0;
+  r=await fetch(SUPA_URL+"/rest/v1/mods",{method:"POST",headers:{...H,"Content-Type":"application/json"},body:JSON.stringify({name:f.get("name"),game:f.get("game"),cat:f.get("cat"),descr:f.get("desc"),author:f.get("by")||"Anónimo",path,original:file.name})});if(!r.ok)throw 0;
+  e.target.reset();modal.classList.remove("open");cat="Todos";await load();toast("Mod publicado")}
+ catch{toast("No se pudo subir el mod")}b.disabled=false});
+for(let i=0;i<14;i++){const s=document.createElement("i");s.className="bub";const z=6+Math.random()*16;
+ s.style.cssText=`left:${Math.random()*100}%;width:${z}px;height:${z}px;animation-duration:${8+Math.random()*10}s;animation-delay:${-Math.random()*12}s`;$(".hero").appendChild(s)}
+draw();load();
+</script>
+</body>
+  </html>
+  
