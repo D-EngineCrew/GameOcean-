@@ -100,7 +100,7 @@ footer{padding:30px 5vw;color:var(--mute);border-top:1px solid rgba(25,227,255,.
 const CATS=[["Todos","🌊"],["Mods","🧩"],["Interfaces","🖥️"],["Fondos de mar","🐠"],["Fondos neón","💠"],["Texturas","🎨"],["Shaders","✨"],["Sonidos","🔊"],["Herramientas","🛠️"]];
 const COLORS=["#0a2a5e,#19e3ff","#061a3d,#3dffd0","#0d3b86,#7b5cff","#04264f,#00b4ff"];
 /* Pega aquí los datos de tu proyecto de Supabase (Project Settings > API): la URL y la clave "anon public". */
-const SUPA_URL="",SUPA_KEY="";
+const SUPA_URL="https://pepsjivqbiwjvtuqnonu.supabase.co",SUPA_KEY="sb_publishable_kVp4Jel0Mes2VwY2WYCAFQ_Lf8p8EVw";
 const H={apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY};
 const BAD=/\.(exe|bat|cmd|msi|scr|js|vbs|ps1|html?|svg)$/i;
 const fileUrl=m=>`${SUPA_URL}/storage/v1/object/public/mods/${m.path}?download=${encodeURIComponent(m.original)}`;
