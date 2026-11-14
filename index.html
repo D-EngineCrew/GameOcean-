@@ -42,7 +42,10 @@ h2{font-size:22px;margin-bottom:16px;color:var(--aqua)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
 .mod{background:var(--card);border-radius:16px;overflow:hidden;border:1px solid rgba(25,227,255,.18);transition:transform .2s,box-shadow .2s}
 .mod:hover{transform:translateY(-4px);box-shadow:var(--glow)}
-.thumb{height:130px;display:grid;place-items:center;font-size:44px}
+.thumb{height:130px;display:grid;place-items:center;font-size:44px;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb.txt{font:800 22px/1.15 Unbounded,Figtree,sans-serif;text-align:center;padding:12px;word-break:break-word}
+.modal input[type=color]{height:42px;padding:2px;cursor:pointer}
 .mod div.info{padding:14px}
 .mod h3{font:700 16px Figtree;margin-bottom:2px}
 .meta{color:var(--mute);font-size:13px}
@@ -91,6 +94,9 @@ footer{padding:30px 5vw;color:var(--mute);border-top:1px solid rgba(25,227,255,.
     <label>Categoría<select name="cat" id="catSel"></select></label>
     <label>Descripción<textarea name="desc" rows="3" maxlength="300"></textarea></label>
     <label>Archivo<input type="file" name="file" id="file" required></label>
+    <label>Imagen de portada (opcional)<input type="file" name="img" accept="image/png,image/jpeg,image/webp,image/gif"></label>
+    <label>Texto de portada (si no hay imagen)<input name="ttext" maxlength="30" placeholder="Si lo dejas vacío, usa el nombre del mod"></label>
+    <div class="row" style="justify-content:flex-start"><label style="flex:1">Color del texto<input type="color" name="tcolor" value="#19e3ff"></label><label style="flex:1">Color de fondo<input type="color" name="tbg" value="#061a3d"></label></div>
     <div class="row"><button type="button" class="btn ghost" id="close">Cancelar</button><button class="btn">Publicar</button></div>
   </form>
 </div>
@@ -101,7 +107,7 @@ const CATS=[["Todos","🌊"],["Mods","🧩"],["Interfaces","🖥️"],["Fondos d
 const COLORS=["#0a2a5e,#19e3ff","#061a3d,#3dffd0","#0d3b86,#7b5cff","#04264f,#00b4ff"];
 /* Pega aquí los datos de tu proyecto de Supabase (Project Settings > API): la URL y la clave "anon public". */
 const SUPA_URL="https://pepsjivqbiwjvtuqnonu.supabase.co",SUPA_KEY="sb_publishable_kVp4Jel0Mes2VwY2WYCAFQ_Lf8p8EVw";
-const H={apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY};
+const H=SUPA_KEY.startsWith("sb_")?{apikey:SUPA_KEY}:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY};
 const BAD=/\.(exe|bat|cmd|msi|scr|js|vbs|ps1|html?|svg)$/i;
 const fileUrl=m=>`${SUPA_URL}/storage/v1/object/public/mods/${m.path}?download=${encodeURIComponent(m.original)}`;
 let mods=[];
@@ -117,7 +123,7 @@ function draw(){
  const l=mods.filter(m=>(cat=="Todos"||m.cat==cat)&&(m.name+m.game+m.by).toLowerCase().includes(q));
  $("#title").textContent=q?"Resultados":cat=="Todos"?"Mods destacados":cat;
  $("#grid").innerHTML=l.length?l.map((m,i)=>{const [a,b]=COLORS[i%4].split(",");const e=(CATS.find(c=>c[0]==m.cat)||[0,"🌊"])[1];
- return `<article class="mod"><div class="thumb" style="background:linear-gradient(135deg,${a},${b}55)">${e}</div><div class="info"><h3>${esc(m.name)}</h3><div class="meta">${esc(m.game)} · por ${esc(m.by)}</div><p class="meta">${esc(m.desc||"")}</p><div class="tags"><span>${esc(m.cat)}</span><span>${m.dl} descargas</span></div><p><a class="btn" style="display:inline-block" href="${fileUrl(m)}" data-id="${m.id}">Descargar</a></p></div></article>`}).join(""):`<div class="empty">No hay mods aquí todavía. Sé el primero en subir uno.</div>`;
+ return `<article class="mod">${thumb(m,a,b,e)}<div class="info"><h3>${esc(m.name)}</h3><div class="meta">${esc(m.game)} · por ${esc(m.by)}</div><p class="meta">${esc(m.desc||"")}</p><div class="tags"><span>${esc(m.cat)}</span><span>${m.dl} descargas</span></div><p><a class="btn" style="display:inline-block" href="${fileUrl(m)}" data-id="${m.id}">Descargar</a></p></div></article>`}).join(""):`<div class="empty">No hay mods aquí todavía. Sé el primero en subir uno.</div>`;
  drawCats();
 }
 document.addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(b){cat=b.dataset.c;draw()}});
@@ -126,6 +132,10 @@ const modal=$("#modal");
 $("#open").onclick=()=>modal.classList.add("open");
 $("#close").onclick=()=>modal.classList.remove("open");
 modal.addEventListener("click",e=>{if(e.target==modal)modal.classList.remove("open")});
+function thumb(m,a,b,e){
+ if(m.thumb_img)return `<div class="thumb"><img src="${esc(SUPA_URL)}/storage/v1/object/public/mods/${encodeURI(m.thumb_img)}" alt="" loading="lazy"></div>`;
+ if(m.thumb_text)return `<div class="thumb txt" style="background:${esc(m.thumb_bg||"#0a2a5e")};color:${esc(m.thumb_color||"#ffffff")}">${esc(m.thumb_text)}</div>`;
+ return `<div class="thumb" style="background:linear-gradient(135deg,${a},${b}55)">${e}</div>`}
 function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",2600)}
 async function load(){if(!SUPA_URL){toast("Falta configurar Supabase en el código");return}
  try{const r=await fetch(SUPA_URL+"/rest/v1/mods?select=*&order=created_at.desc",{headers:H});if(!r.ok)throw 0;mods=(await r.json()).map(x=>({...x,by:x.author||"Anónimo",desc:x.descr}));draw()}catch{toast("No se pudo conectar con Supabase")}}
@@ -137,7 +147,11 @@ $("#form").addEventListener("submit",async e=>{e.preventDefault();if(!SUPA_URL)r
  b.disabled=true;
  try{const ext=(file.name.match(/\.[A-Za-z0-9]{1,8}$/)||[""])[0].toLowerCase(),path=crypto.randomUUID()+ext;
   let r=await fetch(`${SUPA_URL}/storage/v1/object/mods/${path}`,{method:"POST",headers:{...H,"Content-Type":file.type||"application/octet-stream"},body:file});if(!r.ok)throw 0;
-  r=await fetch(SUPA_URL+"/rest/v1/mods",{method:"POST",headers:{...H,"Content-Type":"application/json"},body:JSON.stringify({name:f.get("name"),game:f.get("game"),cat:f.get("cat"),descr:f.get("desc"),author:f.get("by")||"Anónimo",path,original:file.name})});if(!r.ok)throw 0;
+  let img=null;const im=f.get("img");
+  if(im&&im.size){if(!/^image\/(png|jpe?g|webp|gif)$/.test(im.type)||im.size>5*1024*1024){toast("La imagen debe ser PNG, JPG, WEBP o GIF de hasta 5 MB");b.disabled=false;return}
+   img="img/"+crypto.randomUUID()+"."+im.type.split("/")[1].replace("jpeg","jpg");
+   r=await fetch(`${SUPA_URL}/storage/v1/object/mods/${img}`,{method:"POST",headers:{...H,"Content-Type":im.type},body:im});if(!r.ok)throw 0}
+  r=await fetch(SUPA_URL+"/rest/v1/mods",{method:"POST",headers:{...H,"Content-Type":"application/json"},body:JSON.stringify({name:f.get("name"),game:f.get("game"),cat:f.get("cat"),descr:f.get("desc"),author:f.get("by")||"Anónimo",path,original:file.name,thumb_img:img,thumb_text:img?null:(f.get("ttext")||f.get("name")).slice(0,30),thumb_color:f.get("tcolor"),thumb_bg:f.get("tbg")})});if(!r.ok)throw 0;
   e.target.reset();modal.classList.remove("open");cat="Todos";await load();toast("Mod publicado")}
  catch{toast("No se pudo subir el mod")}b.disabled=false});
 for(let i=0;i<14;i++){const s=document.createElement("i");s.className="bub";const z=6+Math.random()*16;
@@ -145,5 +159,4 @@ for(let i=0;i<14;i++){const s=document.createElement("i");s.className="bub";cons
 draw();load();
 </script>
 </body>
-  </html>
-  
+</html>
